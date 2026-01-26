@@ -1,8 +1,14 @@
 ---
-title: "hw2"
+title: "HW2"
 author: "Sarayu Ramnath"
 format: html
 editor: visual
+date: 2026-01-25
+editor_options: 
+  chunk_output_type: console
+format:
+  pdf:
+    pdf-engine: xelatex
 ---
 
 ## Quarto
