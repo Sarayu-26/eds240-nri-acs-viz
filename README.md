@@ -41,7 +41,7 @@ If access is restricted, please contact **[email or contact info]**.
 
   The resulting dataset contains 3,100+ county observations across 3 key variables and is geometry-free / tabular for visualization and comparative analysis.
     
-      
+  ---     
       ## Usage
       
       You can load the processed dataset in **R**:
@@ -51,7 +51,7 @@ If access is restricted, please contact **[email or contact info]**.
     data <- read_csv("data/nri_counties.csv")
     ```
     
-    ---
+  ---
       
       ## Contact
       
