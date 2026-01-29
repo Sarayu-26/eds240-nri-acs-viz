@@ -19,16 +19,15 @@ This repository contains  code and resources for visualizing the FEMA National R
   
   ## Data Access
   
-  * **Processed data:** `data/[filename].csv` is **[included in the repository / held in .gitignore / available upon request]**.
-If access is restricted, please contact **[email or contact info]**.
-* **Raw data:** **[Description of raw data]** are **[not included / partially included]** to reduce repository size. They can be accessed or re-downloaded from **[data source + link]**.
-* **Spatial data / boundaries:** Located in `data/[folder or filename]` and publicly available at **[link]**, with metadata available at **[link]**.
+  * **Processed data:** `data/nri_counties.csv` is ** held in .gitignore / available upon request]**.
+If access is restricted, please contact **sramnath@bren.ucsb.edu**.
+* **Raw data:** **of NRI dataset** are **[not included through .gitignore** to reduce repository size. They can be accessed or re-downloaded from **Fema.gov : https://www.fema.gov/flood-maps/products-tools/national-risk-index**.
 
 ---
   
   ## Data Citation
   
-  1. **NRI Dataset**
+  **NRI Dataset**
   
   Federal Emergency Management Agency (FEMA), National Risk Index Dataset: National Risk Index County_National Risk Index_Rating_Composite - v1.20. Retrieved from https://fema.maps.arcgis.com/home/item.html?id=5771b821a2124413b2ee590a73ca338d on December 13, 2025, 12:34 PM EST. This product uses the FEMA National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
   
