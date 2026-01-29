@@ -40,8 +40,9 @@ If access is restricted, please contact **sramnath@bren.ucsb.edu**.
 
   The resulting dataset contains 3,100+ county observations across 3 key variables and is geometry-free / tabular for visualization and comparative analysis.
     
-  ---     
-      ## Usage
+ ---
+  
+  ## Usage
       
       You can load the processed dataset in **R**:
       
@@ -50,9 +51,9 @@ If access is restricted, please contact **sramnath@bren.ucsb.edu**.
     data <- read_csv("data/nri_counties.csv")
     ```
     
-  ---
-      
-      ## Contact
+ ---
+  
+  ## Contact 
       
       **Sarayu Ramnath**
       **sramnath@bren.ucsb.edu**
