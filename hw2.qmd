@@ -25,7 +25,7 @@ Create a data viz that helps to answer the question, How do FEMA National Risk I
 
     -   Community resilience score: which could be interesting because a low resilience score can make a moderate hazard risk even worse.
 
-    -   Visual Objective: Show how CA counties rank relative in community resilience score to all the other counties in the United States. maybe histogram to show density
+    -   Visual Objective: Show how CA counties rank relative in community resilience score to all the other counties in the United States. Maybe histogram to show density.
 
 ## Data Wrangling
 
@@ -104,7 +104,7 @@ ggplot(nri_us, aes(x = ca_county, y = resilience_score, color = ca_county)) +
   )
 ```
 
-###### *Alt-Text: Boxplot of community resilience scores (0-100) comparing California counties to the rest of the counties in the United States. California counties are shown as teal jittered points with a light green boxplot, while other U.S. counties are summarized in a  light blue. Dark red points show population-weighted means (CA:34; U.S. 60). California's median and overall range are lower than the national distribution.* 
+###### *Alt-Text: Boxplot of community resilience scores (0-100) comparing California counties to the rest of the counties in the United States. California counties are shown as teal jittered points with a light green boxplot, while other U.S. counties are summarized in a light blue. Dark red points show population-weighted means (CA:34; U.S. 60). California's median and overall range are lower than the national distribution.*
 
 **Question 1** : What are your variables of interest and what kinds of data are they?
 
