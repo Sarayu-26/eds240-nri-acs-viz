@@ -84,46 +84,46 @@ Tidy data further
 #| warning: FALSE
 
 
-#1. Clean column names 
-nri_ca_race_tidy <- nri_ca_race_raw |>
-  janitor::clean_names() |>  
-  select(
-    county_name,
-    state_county_fips_code,
-    population_2020,
-    national_risk_index_value_composite,
-    national_risk_index_score_composite,
-    national_risk_index_rating_composite,
-    national_risk_index_state_percentile_composite,
-    variable,
-    estimate,
-    label,
-    concept
-  ) |>  # 2. Keep only relevant columns
-  filter(concept %in% c("Race", "Hispanic or Latino Origin by Race")) |>  # 3. Only race/ethnicity
-  mutate(  # 4. Clean up race/ethnicity labels
-    race_ethnicity = case_when(
-      grepl("White alone", label) ~ "White",
-      grepl("Black or African American", label) ~ "Black or African American",
-      grepl("Asian alone", label) ~ "Asian",
-      grepl("American Indian", label) ~ "American Indian / Alaska Native",
-      grepl("Native Hawaiian", label) ~ "Native Hawaiian / Pacific Islander",
-      grepl("Some Other Race", label) ~ "Other Race",
-      grepl("Two or More Races", label) ~ "Two or More Races",
-      grepl("Hispanic or Latino", label) ~ "Hispanic or Latino",
-      grepl("Not Hispanic or Latino", label) ~ "Not Hispanic or Latino",
-      TRUE ~ "Other"
-    )
-  ) |>
-  group_by(county_name) |>  # 5. Compute race proportion
-  mutate(race_pct = estimate / sum(estimate, na.rm = TRUE)) |>
-  ungroup() |>
-  mutate(weighted_nri = race_pct * national_risk_index_value_composite)|># 6. Weighted NRI
-   select(-label) #7. drop label column 
+# #1. Clean column names 
+# nri_ca_race_tidy <- nri_ca_race_raw |>
+#   janitor::clean_names() |>  
+#   select(
+#     county_name,
+#     state_county_fips_code,
+#     population_2020,
+#     national_risk_index_value_composite,
+#     national_risk_index_score_composite,
+#     national_risk_index_rating_composite,
+#     national_risk_index_state_percentile_composite,
+#     variable,
+#     estimate,
+#     label,
+#     concept
+#   ) |>  # 2. Keep only relevant columns
+#   filter(concept %in% c("Race", "Hispanic or Latino Origin by Race")) |>  # 3. Only race/ethnicity
+#   mutate(  # 4. Clean up race/ethnicity labels
+#     race_ethnicity = case_when(
+#       grepl("White alone", label) ~ "White",
+#       grepl("Black or African American", label) ~ "Black or African American",
+#       grepl("Asian alone", label) ~ "Asian",
+#       grepl("American Indian", label) ~ "American Indian / Alaska Native",
+#       grepl("Native Hawaiian", label) ~ "Native Hawaiian / Pacific Islander",
+#       grepl("Some Other Race", label) ~ "Other Race",
+#       grepl("Two or More Races", label) ~ "Two or More Races",
+#       grepl("Hispanic or Latino", label) ~ "Hispanic or Latino",
+#       grepl("Not Hispanic or Latino", label) ~ "Not Hispanic or Latino",
+#       TRUE ~ "Other"
+#     )
+#   ) |>
+#   group_by(county_name) |>  # 5. Compute race proportion
+#   mutate(race_pct = estimate / sum(estimate, na.rm = TRUE)) |>
+#   ungroup() |>
+#   mutate(weighted_nri = race_pct * national_risk_index_value_composite)|># 6. Weighted NRI
+#    select(-label) #7. drop label column 
 
 # Save tidy dataset
-write_csv(nri_ca_race_tidy, here::here("data", "nri_ca_race_tidy.csv"))
-
+#write_csv(nri_ca_race_tidy, here::here("data", "nri_ca_race_tidy.csv"))
+nri_ca_race_tidy <- read_csv(here::here("data", "nri_ca_race_tidy.csv"))
 ```
 
 Circular plot
@@ -207,4 +207,8 @@ ggsave("nri_circular_plot.png",
 
 -   **4.** What modifications did you make to this visualization to make it more easily readable?
 
+    -   margins, font size, reordered categories in descending nri index value, adjusted color palette
+
 -   **5.** Is there anything you wanted to implement, but didn’t know how? If so, please describe.
+
+    -   i didn't know how to make the circle plot bigger i worked with y lim, plot margins, save ggplot margins
