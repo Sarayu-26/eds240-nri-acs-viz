@@ -56,7 +56,8 @@ library(readr)
 ***How does climate hazard risk exposure vary across racial / ethnic groups in California?***
 
 ```{r}
-
+#| echo: TRUE
+#| warning: FALSE
 # nri_ca_race_raw <- nri_raw |>
 #   janitor::clean_names()|>
 #   select(1:17) |>
@@ -79,6 +80,9 @@ nri_ca_race_raw <- read_csv(here::here("data", "nri_ca_race_raw.csv"))
 Tidy data further
 
 ```{r}
+#| echo: TRUE
+#| warning: FALSE
+
 
 #1. Clean column names 
 nri_ca_race_tidy <- nri_ca_race_raw |>
@@ -125,6 +129,10 @@ write_csv(nri_ca_race_tidy, here::here("data", "nri_ca_race_tidy.csv"))
 Circular plot
 
 ```{r}
+#| echo: TRUE
+#| warning: FALSE
+
+
 library(tidyverse)
 library(RColorBrewer)
 
