@@ -1,18 +1,14 @@
 ---
 title: "hw3"
-author: "Sarayu Ramnath"
-editor: visual
-date: 2026-01-25
-editor_options: 
-  chunk_output_type: console
-format:
-  pdf:
-    pdf-engine: xelatex
-    theme: cerulean
-knitr:
-  opts_chunk:
-    warning: false
-    message: false
+author: "Sarayu Ramnath" 
+date: "2/12/2026"
+format: html
+embed-resources: true
+theme: simplex
+execute:
+  echo: true
+message: false
+warning: false
 ---
 
 ## Set Up
@@ -55,9 +51,20 @@ library(readr)
 
 ***How does climate hazard risk exposure vary across racial / ethnic groups in California?***
 
+Data Tidying pt 1: Combining Hazard Risk with Race and Ethnicity
+
+1.  Prepped NRI data
+    -   clean names
+    -   select first 17 column variables (core) NRI variables
+    -   filter to CA counties using state FIPS code
+2.  Join race and ethnicity census data
+    -   Left join using county-level FIPS code
+    -   Kept all counties from NRI dataset and attached race and ethnicity estimates.
+
 ```{r}
 #| echo: TRUE
 #| warning: FALSE
+
 # nri_ca_race_raw <- nri_raw |>
 #   janitor::clean_names()|>
 #   select(1:17) |>
@@ -77,14 +84,26 @@ nri_ca_race_raw <- read_csv(here::here("data", "nri_ca_race_raw.csv"))
 
 ```
 
-Tidy data further
+Data Tidying Pt 2: Race-weighted National Risk Index by County
+
+Possible visualization to answer the question d: Which racial and ethnic groups are more represented in counties with higher overall hazard risk when accounting for the portion of the population?
+
+1.  Select relevant demographic and risk variables
+    -   keep county identifiers, population totals, NRI composite metrics, race/ethnicity fields.
+2.  Filter for race and ethnicity concepts
+    -   keep census records related to race and Hispanic/Latino origin.
+3.  Recode census labels to standardize categories
+4.  Calculate race/ethnicity proportions
+    -   Group data by county
+    -   convert population estimates to proportions of total county population.
+    -   To have fair comparison across counties with different population sizes.
 
 ```{r}
 #| echo: TRUE
 #| warning: FALSE
 
 
-# #1. Clean column names 
+# 1. Clean column names 
 # nri_ca_race_tidy <- nri_ca_race_raw |>
 #   janitor::clean_names() |>  
 #   select(
@@ -115,33 +134,51 @@ Tidy data further
 #       TRUE ~ "Other"
 #     )
 #   ) |>
-#   group_by(county_name) |>  # 5. Compute race proportion
+#   group_by(county_name) |>  # 5. Calculate race proportion
 #   mutate(race_pct = estimate / sum(estimate, na.rm = TRUE)) |>
 #   ungroup() |>
 #   mutate(weighted_nri = race_pct * national_risk_index_value_composite)|># 6. Weighted NRI
 #    select(-label) #7. drop label column 
 
 # Save tidy dataset
+
 #write_csv(nri_ca_race_tidy, here::here("data", "nri_ca_race_tidy.csv"))
 nri_ca_race_tidy <- read_csv(here::here("data", "nri_ca_race_tidy.csv"))
 ```
 
-Circular plot
+Pivot: County-level race/ethnicity weighted NRI values were highly skewed with a small number of counties taking over the plot and overshadowing broader patterns. Now shifting from county-level to statewide aggregation by race and ethnicity but emphasizing cumulative population-weighted hazard burden.
+
+1.  Aggregate across counties by race and ethnicity.
+
+    -   Group by race & ethnicity only.
+
+    -   sum race-weighted NRI values across all counties
+
+    -   sum population counts for demographic context.
+
+2.  Rank racial & ethnic groups by cumulative burden
+
+    -   convert race and ethnicity categories to ordered factors.
+
+    -   Add ID numbers to plot function order.
 
 ```{r}
-#| echo: TRUE
-#| warning: FALSE
-
+#| echo: true
+#| warning: false 
 
 library(tidyverse)
 library(RColorBrewer)
+library(showtext)
 
 # -----------------------------
 # Aggregate by race/ethnicity
 # -----------------------------
 nri_race_summary <- nri_ca_race_tidy |>
   group_by(race_ethnicity) |>
-  summarize(total_weighted_nri = sum(weighted_nri)) |>
+  summarize(
+    total_weighted_nri = sum(weighted_nri, na.rm = TRUE),
+    total_population = sum(estimate, na.rm = TRUE)
+    ) |>
   arrange(desc(total_weighted_nri)) |>
   mutate(id = row_number(), 
          race_ethnicity = factor(race_ethnicity, levels = race_ethnicity)  
@@ -152,6 +189,23 @@ nri_race_summary <- nri_ca_race_tidy |>
 # -----------------------------
 race_palette <- brewer.pal(8, "Paired")
 names(race_palette) <- nri_race_summary$race_ethnicity
+
+# -----------------------------
+# Set fonts 
+# -----------------------------
+font_add_google("Source Sans Pro", "sourcesans")
+font_add_google("Merriweather", "merriweather") 
+showtext_auto()
+```
+
+ggplot Circular Bar Plot
+
+```{r}
+#| label: nri-circular barplot
+#| fig-alt: "Circular bar chart of climate hazard exposure across racial/ethnic groups in California. Hispanic or Latino populations have the highest exposure (15.7 billion weighted NRI), followed by White (5.9 billion), with Native Hawaiian/Pacific Islander showing the lowest (57 million). Eight distinct colored segments represent each group in descending order."
+#| fig-width: 6
+#| fig-height: 4
+
 # -----------------------------
 # Plot
 # -----------------------------
@@ -163,52 +217,62 @@ ggplot(nri_race_summary, aes(x = as.factor(id), y = total_weighted_nri, fill = r
        max(nri_race_summary$total_weighted_nri) * 1.1) +
   theme_void() +
   theme(
-    legend.position = "right",
-    legend.title = element_text(face = "bold", size = 11),
-    legend.text = element_text(size = 9),
-    legend.key.size = unit(0.4, "cm"),  # Small legend keys
-    legend.spacing.y = unit(0.1, "cm"),  # Tight spacing
+    text = element_text(family = "sourcesans"),
     plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
-    plot.subtitle = element_text(size = 11, hjust = 0.5, color = "gray30"),
-    plot.caption = element_text(size = 8, hjust = 1, color = "gray50"),
+    plot.subtitle = element_text(family = "merriweather", size = 12, hjust = 0.5, color = "gray30"),
+    plot.caption = element_text(family = "merriweather", size = 8, hjust = 1, color = "gray50"),
     plot.margin = unit(c(1, 1, 0.5, 0.5), "cm"), 
-    aspect.ratio = 1
+     legend.position = "right",
+    legend.title = element_text(face = "bold", size = 11, family = ),
+    legend.text = element_text(size = 9),
+    legend.key.size = unit(0.4, "cm"),
+    legend.spacing.y = unit(0.1, "cm")
   ) +
   labs(
-    title = "Climate Hazard Exposure by Race/Ethnicity in California",
-    subtitle = "Total Weighted National Risk Index Across All Counties",
+    title = "Who Bears Climate Hazard Risk in California?",
+    subtitle = "Population-weighted National Risk Index across California",
     caption = "Data: FEMA National Risk Index (2023)",
     fill = "Race/Ethnicity"
   )
-
-ggsave("nri_circular_plot.png", 
-       width = 12, height = 12, dpi = 300, bg = "white")
 ```
 
-![Alt-Text: Circular bar chart of climate hazard exposure across racial/ethnic groups in California. Hispanic or Latino populations show the highest exposure (15.7 billion weighted NRI), followed by White (5.9 billion), with Native Hawaiian/Pacific Islander showing the lowest (57 million). Eight distinct colored segments represent each group in descending order.](nri_circular_plot.png){fig-align="center"}
+*Alt-Text: "Circular bar chart of climate hazard exposure across racial/ethnic groups in California. Hispanic or Latino populations have the highest exposure (15.7 billion weighted NRI), followed by White (5.9 billion), with Native Hawaiian/Pacific Islander showing the lowest (57 million). Eight distinct colored segments represent each group in descending order. Note: This visualization shows cumulative population-weighted hazard burden. Smaller populations may experience high per-capita risk even if their total weighted NRI appears low."*
 
-![Circular bar chart of climate hazard exposure across racial/ethnic groups in California. Hispanic or Latino populations show the highest exposure (15.7 billion weighted NRI), followed by White (5.9 billion), with Native Hawaiian/Pacific Islander showing the lowest (57 million). Eight distinct colored segments represent each group in descending order.](nri_circular_plot.png)
+(Side note, this alt-text is in the chunk header and it is not rendering so I am also adding it here).
 
 ## Questions
 
--   **1.** What are your variables of interest and what kinds of data (e.g. numeric, categorical, ordered, etc.) are they (a bullet point list is fine)?
+**1.** What are your variables of interest and what kinds of data (e.g. numeric, categorical, ordered, etc.) are they?
 
--   **2.** How did you decide which type of graphic form was best suited for answering the question? What alternative graphic forms could you have used instead? Why did you settle on this particular graphic form?
+-   Race/ Ethnicity: Categorical
 
-    -   I looked at racetrack plot but I need to log10 scale and it skewed other NRI to be too big
+-   Total Weighted NRI: Numeric (continuous)
 
-    -   Looked at lollipop but it felt like a barchart to me
+-   Id: Numeric/ ordered index assigned to each group after sorting. Helped order bars in plots.
 
-    -   looked at stacked bar plot and while it would show it the best
+-   Race_palette: categorical mapping to colors based on group.
 
-    -   felt like you could understand magnitude of weighted nri even with the circular plot
+**2.** How did you decide which type of graphic form was best suited for answering the question? What alternative graphic forms could you have used instead? Why did you settle on this particular graphic form?
 
--   **3.** Summarize your main finding in no more than two sentences.
+-   Racetrack (radial) plot: I initially considered, but the highest NRI groups dominated and skewed the visualization, hiding the smaller values and log10 scaling didn't help so I left it.
 
--   **4.** What modifications did you make to this visualization to make it more easily readable?
+-   Lollipop chart: Visually looked similiar to a bar chart but didn't provide any additional clarity.
 
-    -   margins, font size, reordered categories in descending nri index value, adjusted color palette
+-   Stacked bar plot: would clearly show distribution and magnitude but visually it was less engaging.
 
--   **5.** Is there anything you wanted to implement, but didn’t know how? If so, please describe.
+-   Ultimately I chose circular barplot because you can see the relative magnitudes of cumulative weighted NRI across groups. Even with the wide differences in values the circular layout made it easier to interpret the scale and rank order of exposure.
 
-    -   i didn't know how to make the circle plot bigger i worked with y lim, plot margins, save ggplot margins
+**3.** Summarize your main finding in no more than two sentences.
+
+Hispanic or Latino population bear the highest cumulative hazard burden, due to a larger population and residence in higher-risk counties. Smaller populations such as American Indian/ Alaska Native and Native Hawaiian/ Pacific Islander communities may face high per-capita risk even if their total weighted NRI appears lower.
+
+**4.** What modifications did you make to this visualization to make it more easily readable?
+
+-   Reordered categories by descending weighted NRI to emphasize magnitude and rank.
+-   Adjusted margins and spacing to prevent crowding and improve balance.
+-   Adjusted font sizes for text for clarity.
+-   Selected distinct color palette to differentiate groups clearly.
+
+**5.** Is there anything you wanted to implement, but didn’t know how? If so, please describe.
+
+-   I wanted to make the circular barplot larger because there is a lot of white space in the figure, but I couldn't figure out how to fully adjust the plot size in combination with ylim, plot margins, and saving the figure in ggplot2. I experimented with all of them but couldn't get a larger plot.
