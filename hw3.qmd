@@ -190,6 +190,8 @@ nri_race_summary <- nri_ca_race_tidy |>
 race_palette <- brewer.pal(8, "Paired")
 names(race_palette) <- nri_race_summary$race_ethnicity
 
+pal_palette <- c("#6A0304", "#F02224", "#F85550","#5F8A80", "#B5CEA7", "#ABAE39", "#4C4A21", "#312C16")
+names(pal_palette) <- nri_race_summary$race_ethnicity
 # -----------------------------
 # Set fonts 
 # -----------------------------
@@ -211,7 +213,7 @@ ggplot Circular Bar Plot
 # -----------------------------
 ggplot(nri_race_summary, aes(x = as.factor(id), y = total_weighted_nri, fill = race_ethnicity)) +
   geom_bar(stat = "identity", width = 1) +
-  scale_fill_manual(values = race_palette) +
+  scale_fill_manual(values = pal_palette) +
   coord_polar(start = 0) +
   ylim(-max(nri_race_summary$total_weighted_nri) * 0.2,
        max(nri_race_summary$total_weighted_nri) * 1.1) +
